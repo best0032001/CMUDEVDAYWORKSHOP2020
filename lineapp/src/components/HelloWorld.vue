@@ -135,7 +135,7 @@ export default {
   beforeCreate() {
     console.log("init");
     this.$liff.init(
-      { liffId: "1653974691-mk2jqd8L" },
+      { liffId: "xxxxxxxxxxxxxxxx" },
       () => {
         if (this.$liff.isLoggedIn()) {
           console.log("isLoggedIn");
