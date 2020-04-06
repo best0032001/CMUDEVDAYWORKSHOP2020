@@ -1,141 +1,190 @@
 <template>
   <v-container>
-    <v-row class="text-center">
-      <v-col cols="12">
-        <v-img
-          :src="require('../assets/logo.svg')"
-          class="my-3"
-          contain
-          height="200"
-        />
-      </v-col>
+    <v-app id="inspire">
+      <v-dialog
+        v-model="dialog"
+        fullscreen
+        hide-overlay
+        transition="dialog-bottom-transition"
+      >
+        <!--<template v-slot:activator="{ on }">
+                    <v-btn color="primary" dark v-on="on">Open Dialog</v-btn>
+                </template>-->
+        <v-card>
+          <v-toolbar dark color="primary">
+            <!--<v-btn icon dark @click="dialog = false">
+                            <v-icon>mdi-close</v-icon>
+                        </v-btn>-->
+            <v-toolbar-title>CMUPAC LOGOUT</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <!--<v-toolbar-items>
+                            <v-btn dark text @click="dialog = false">Save</v-btn>
+                        </v-toolbar-items>-->
+          </v-toolbar>
+          <v-list three-line subheader>
+            <v-subheader>User Controls</v-subheader>
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>Logout successful</v-list-item-title>
+              </v-list-item-content>
+            </v-list-item>
+          </v-list>
+          <v-divider></v-divider>
+        </v-card>
+      </v-dialog>
+      <v-navigation-drawer v-model="drawer" app clipped>
+        <v-list dense>
+          <v-list-item>
+            <v-list-item-action>
+              <v-icon>dashboard</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>Menu</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-action>
+              <v-icon>fas fa-circle-notch fa-spin</v-icon>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>v. beta 0.08 </v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+        <template v-slot:append>
+          <div class="pa-2">
+            <v-btn color="blue darken-1" block @click="logout">Logout</v-btn>
+          </div>
+        </template>
+      </v-navigation-drawer>
 
-      <v-col class="mb-4">
-        <h1 class="display-2 font-weight-bold mb-3">
-          Welcome to Vuetify
-        </h1>
+      <v-app-bar app clipped-left>
+        <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
 
-        <p class="subheading font-weight-regular">
-          For help and collaboration with other Vuetify developers,
-          <br />please join our online
-          <a href="https://community.vuetifyjs.com" target="_blank"
-            >Discord Community</a
-          >
-        </p>
-      </v-col>
+        <v-toolbar-title>CMU DEVDAY WORKSHOP</v-toolbar-title>
+      </v-app-bar>
+      <v-content>
+        <v-container v-if="tab1">
+          <v-card class="mx-auto" max-width="100%" tile>
+            <v-img
+              height="100%"
+              src="https://cdn.vuetifyjs.com/images/cards/server-room.jpg"
+            >
+              <v-row align="end" class="fill-height">
+                <v-col align-self="start" class="pa-0" cols="12">
+                  <v-avatar class="profile" color="grey" size="164" tile>
+                    <v-img :src="getPhoto()"></v-img>
+                  </v-avatar>
+                </v-col>
+                <v-col class="py-0">
+                  <v-list-item color="rgba(0, 0, 0, .4)" dark>
+                    <v-list-item-content>
+                      <v-list-item-title class="title"
+                        >{{ lineprofile.displayName
+                        }}{{ hrprofile.nameEng }}</v-list-item-title
+                      >
+                      <v-list-item-subtitle
+                        >{{ lineprofile.statusMessage }}
+                        {{ hrprofile.positionNameTha }}</v-list-item-subtitle
+                      >
+                    </v-list-item-content>
+                  </v-list-item>
+                </v-col>
+              </v-row>
+            </v-img>
+          </v-card>
+        </v-container>
+      </v-content>
+      <v-bottom-navigation app fixed grow color="primary">
+        <v-btn @click="getLineProfile">
+          <span>Line Profile</span>
+          <v-icon>account_box</v-icon>
+        </v-btn>
 
-      <v-col class="mb-5" cols="12">
-        <h2 class="headline font-weight-bold mb-3">
-          What's next?
-        </h2>
-
-        <v-row justify="center">
-          <a
-            v-for="(next, i) in whatsNext"
-            :key="i"
-            :href="next.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ next.text }}
-          </a>
-        </v-row>
-      </v-col>
-
-      <v-col class="mb-5" cols="12">
-        <h2 class="headline font-weight-bold mb-3">
-          Important Links
-        </h2>
-
-        <v-row justify="center">
-          <a
-            v-for="(link, i) in importantLinks"
-            :key="i"
-            :href="link.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ link.text }}
-          </a>
-        </v-row>
-      </v-col>
-
-      <v-col class="mb-5" cols="12">
-        <h2 class="headline font-weight-bold mb-3">
-          Ecosystem
-        </h2>
-
-        <v-row justify="center">
-          <a
-            v-for="(eco, i) in ecosystem"
-            :key="i"
-            :href="eco.href"
-            class="subheading mx-3"
-            target="_blank"
-          >
-            {{ eco.text }}
-          </a>
-        </v-row>
-      </v-col>
-    </v-row>
+        <v-btn @click="getHRProfile">
+          <span>HR Profile</span>
+          <v-icon>history</v-icon>
+        </v-btn>
+      </v-bottom-navigation>
+    </v-app>
   </v-container>
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "HelloWorld",
-
   data: () => ({
-    ecosystem: [
-      {
-        text: "vuetify-loader",
-        href: "https://github.com/vuetifyjs/vuetify-loader"
+    lineprofile: {
+      userId: "",
+      displayName: "",
+      pictureUrl: "https://cdn.vuetifyjs.com/images/profiles/marcus.jpg",
+      statusMessage: ""
+    },
+    hrprofile: {
+      email: "",
+      nameEng: "",
+      positionNameTha: ""
+    },
+    drawer: null,
+    dialog: false,
+    tab1: true,
+    tab2: false,
+    tab3: false
+  }),
+  beforeCreate() {
+    console.log("init");
+    this.$liff.init(
+      { liffId: "1653974691-mk2jqd8L" },
+      () => {
+        if (this.$liff.isLoggedIn()) {
+          console.log("isLoggedIn");
+        } else {
+          this.$liff.login();
+        }
       },
-      {
-        text: "github",
-        href: "https://github.com/vuetifyjs/vuetify"
-      },
-      {
-        text: "awesome-vuetify",
-        href: "https://github.com/vuetifyjs/awesome-vuetify"
-      }
-    ],
-    importantLinks: [
-      {
-        text: "Documentation",
-        href: "https://vuetifyjs.com"
-      },
-      {
-        text: "Chat",
-        href: "https://community.vuetifyjs.com"
-      },
-      {
-        text: "Made with Vuetify",
-        href: "https://madewithvuejs.com/vuetify"
-      },
-      {
-        text: "Twitter",
-        href: "https://twitter.com/vuetifyjs"
-      },
-      {
-        text: "Articles",
-        href: "https://medium.com/vuetify"
-      }
-    ],
-    whatsNext: [
-      {
-        text: "Explore components",
-        href: "https://vuetifyjs.com/components/api-explorer"
-      },
-      {
-        text: "Select a layout",
-        href: "https://vuetifyjs.com/layout/pre-defined"
-      },
-      {
-        text: "Frequently Asked Questions",
-        href: "https://vuetifyjs.com/getting-started/frequently-asked-questions"
-      }
-    ]
-  })
+      err => console.error(err.code)
+    );
+  },
+  methods: {
+    getPhoto() {
+      return this.lineprofile.pictureUrl;
+    },
+    reset() {
+      this.lineprofile.userId = "";
+      this.lineprofile.displayName = "";
+      this.lineprofile.statusMessage = "";
+      this.hrprofile.email = "";
+      this.hrprofile.nameEng = "";
+      this.hrprofile.pictureUrl = "";
+      this.hrprofile.positionNameTha = "";
+    },
+    getLineProfile() {
+      this.reset();
+      let _this = this;
+      this.$liff
+        .getProfile()
+        .then(function(profile) {
+          _this.lineprofile = profile;
+          //_this.lineprofile.pictureUrl="\""+_this.lineprofile.pictureUrl+"\""
+          //alert(_this.lineprofile.pictureUrl);
+        })
+        .catch(function(error) {
+          alert("Error getting profile: " + error);
+        });
+    },
+    getHRProfile() {
+
+    },
+    regisaccount(code) {
+
+    },
+    checkregis() {
+
+    },
+    logout() {
+    
+    }
+  }
 };
 </script>
