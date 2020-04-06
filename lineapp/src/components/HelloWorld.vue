@@ -111,7 +111,6 @@
 </template>
 
 <script>
-import axios from "axios";
 export default {
   name: "HelloWorld",
   data: () => ({
@@ -119,18 +118,18 @@ export default {
       userId: "",
       displayName: "",
       pictureUrl: "https://cdn.vuetifyjs.com/images/profiles/marcus.jpg",
-      statusMessage: ""
+      statusMessage: "",
     },
     hrprofile: {
       email: "",
       nameEng: "",
-      positionNameTha: ""
+      positionNameTha: "",
     },
     drawer: null,
     dialog: false,
     tab1: true,
     tab2: false,
-    tab3: false
+    tab3: false,
   }),
   beforeCreate() {
     console.log("init");
@@ -143,7 +142,7 @@ export default {
           this.$liff.login();
         }
       },
-      err => console.error(err.code)
+      (err) => console.error(err.code)
     );
   },
   methods: {
@@ -173,18 +172,12 @@ export default {
           alert("Error getting profile: " + error);
         });
     },
-    getHRProfile() {
-
-    },
+    getHRProfile() {},
     regisaccount(code) {
-
+      console.log(code);
     },
-    checkregis() {
-
-    },
-    logout() {
-    
-    }
-  }
+    checkregis() {},
+    logout() {},
+  },
 };
 </script>
