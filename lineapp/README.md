@@ -1,4 +1,4 @@
-# lineminiapp
+# lineapp
 
 ## Project setup
 ```
