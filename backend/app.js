@@ -150,3 +150,113 @@ app.post("/line", async (req, res) => {
     }
   }
 });
+
+
+app.get("/hr", async (req, res) => {
+  let urlLine = "https://api.line.me/v2/profile";
+  let urlbasicinfo = "https://mis-api.cmu.ac.th/hr/v2/employees/self/basicinfo";
+  var _lineId = "";
+  var lineToken = req.headers.token;
+  console.log(lineToken);
+  try {
+    let response = await axios.get(urlLine, {
+      headers: {
+        Authorization: "Bearer " + lineToken //the token is a variable which holds the token
+      }
+    });
+    _lineId = response.data.userId;
+    console.log(_lineId);
+    const docRef = db.collection("user").doc(_lineId);
+    const getDoc = await docRef.get();
+    if (!getDoc.exists) {
+      console.log("No such document!");
+      return res.sendStatus(404);
+    }
+    console.log(getDoc.data());
+    var _access_token = getDoc.data().access_token;
+    var _refresh_token = getDoc.data().refresh_token;
+    var _cmuitaccount = getDoc.data().cmuitaccount;
+    try {
+      let responseBasicinfo = await axios.get(urlbasicinfo, {
+        headers: {
+          Authorization: "Bearer " + _access_token //the token is a variable which holds the token
+        }
+      });
+      let setDoc = db.collection("user").doc(_lineId);
+      let setBook = setDoc
+        .set({
+          cmuitaccount: _cmuitaccount,
+          lineId: _lineId,
+          access_token: _access_token,
+          refresh_token: _refresh_token,
+          hr: responseBasicinfo.data
+        })
+        .then(doc => {
+          return res.send(responseBasicinfo.data);
+        })
+        .catch(err => {
+          return res.sendStatus(500);
+        });
+    } catch (error) {
+      const docRef = db.collection("user").doc(_lineId);
+      const getDoc = docRef
+        .get()
+        .then(doc => {
+          if (!doc.exists) {
+            console.log("No such document!");
+            return res.send("Not Found");
+          }
+          console.log(doc.data().hr);
+          return res.send(doc.data().hr);
+        })
+        .catch(err => {
+          return res.sendStatus(500);
+        });
+    }
+  } catch (error) {
+    console.log("catch");
+    console.log(error);
+    console.log(error.response.status);
+    if (error.response.status == 401) {
+      return res.sendStatus(401);
+    } else {
+      return res.sendStatus(500);
+    }
+  }
+});
+
+// logout
+app.delete("/line", (req, res) => {
+  let urlLine = "https://api.line.me/v2/profile";
+  var _lineId = "";
+  var lineToken = req.headers.token;
+  axios
+    .get(urlLine, {
+      headers: {
+        Authorization: "Bearer " + lineToken //the token is a variable which holds the token
+      }
+    })
+    .then(function(response) {
+      _lineId = response.data.userId;
+      db.collection("user")
+        .doc(_lineId)
+        .delete()
+        .then(function() {
+          console.log("Document successfully deleted!");
+          return res.sendStatus(200);
+        })
+        .catch(function(error) {
+          console.error("Error removing document: ", error);
+          return res.sendStatus(500);
+        });
+    })
+    .catch(function(error) {
+      console.log("catch");
+      console.log(error.response.status);
+      if (error.response.status == 401) {
+        return res.sendStatus(401);
+      } else {
+        return res.sendStatus(500);
+      }
+    });
+});
