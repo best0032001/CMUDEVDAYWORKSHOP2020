@@ -15,7 +15,7 @@
             <!--<v-btn icon dark @click="dialog = false">
                             <v-icon>mdi-close</v-icon>
                         </v-btn>-->
-            <v-toolbar-title>CMUPAC LOGOUT</v-toolbar-title>
+            <v-toolbar-title>CMU LOGOUT</v-toolbar-title>
             <v-spacer></v-spacer>
             <!--<v-toolbar-items>
                             <v-btn dark text @click="dialog = false">Save</v-btn>
@@ -111,6 +111,7 @@
 </template>
 
 <script>
+import axios from "axios";
 export default {
   name: "HelloWorld",
   data: () => ({
@@ -118,31 +119,44 @@ export default {
       userId: "",
       displayName: "",
       pictureUrl: "https://cdn.vuetifyjs.com/images/profiles/marcus.jpg",
-      statusMessage: "",
+      statusMessage: ""
     },
     hrprofile: {
       email: "",
       nameEng: "",
-      positionNameTha: "",
+      positionNameTha: ""
     },
     drawer: null,
     dialog: false,
     tab1: true,
     tab2: false,
-    tab3: false,
+    tab3: false
   }),
   beforeCreate() {
     console.log("init");
     this.$liff.init(
-      { liffId: "xxxxxxxxxxxxxxxx" },
+      { liffId: "1653974691-mk2jqd8L" },
       () => {
         if (this.$liff.isLoggedIn()) {
           console.log("isLoggedIn");
         } else {
           this.$liff.login();
         }
+        const queryString = decodeURIComponent(window.location.search).replace(
+          "?liff.state=",
+          ""
+        );
+        const params = new URLSearchParams(queryString);
+        const id = params.get("code");
+        if (id != null && id != "") {
+          this.regisaccount(id);
+        } else {
+          this.checkregis();
+        }
+        this.getLineProfile();
+        console.log(" end init");
       },
-      (err) => console.error(err.code)
+      err => console.error(err.code)
     );
   },
   methods: {
@@ -172,12 +186,82 @@ export default {
           alert("Error getting profile: " + error);
         });
     },
-    getHRProfile() {},
-    regisaccount(code) {
-      console.log(code);
+    getHRProfile() {
+      this.reset();
+      const linetoken = this.$liff.getAccessToken();
+      let url = "https://xxxxxxx.herokuapp.com/hr";
+      axios
+        .get(url, {
+          headers: { token: linetoken }
+        })
+        .then(response => {
+          console.log(response);
+          this.hrprofile = response.data.data[0];
+        })
+        .catch(function(error) {
+          console.log("error" + error);
+          alert("error");
+        });
     },
-    checkregis() {},
-    logout() {},
-  },
+    regisaccount(code) {
+      const linetoken = this.$liff.getAccessToken();
+      let url = "https://xxxxxxx.herokuapp.com/line";
+      axios
+        .post(
+          url,
+          {},
+          {
+            headers: { code: code, token: linetoken }
+          }
+        )
+        .then(response => {
+          console.log(response);
+          alert("ลงทะเบียนสำเร็จ");
+        })
+        .catch(function(error) {
+          console.log("error" + error);
+          alert("error");
+        });
+    },
+    checkregis() {
+      console.log("checkregis");
+      const linetoken = this.$liff.getAccessToken();
+      let url = "https://xxxxxxx.herokuapp.com/line";
+      axios
+        .get(url, {
+          headers: { qrcode: "xxx", token: linetoken }
+        })
+        .then(response => {
+          alert("checkregis pass");
+          console.log(response);
+        })
+        .catch(function(error) {
+          console.log("error" + error.response.status);
+          if (error.response.status == 404) {
+            console.log("noregis");
+            alert("checkregis to login");
+            window.location.assign(
+              "https://oauth.cmu.ac.th/v1/Authorize.aspx?response_type=code&client_id=xxxxxxxxxxxxxxxxxxxxxxxx&redirect_uri=line://app/xxxxxxxxxx&scope=cmuitaccount.basicinfo mishr.self.basicinfo"
+            );
+          }
+        });
+    },
+    logout() {
+      const linetoken = this.$liff.getAccessToken();
+      let url = "https://xxxxxxx.herokuapp.com/line";
+      axios
+        .delete(url, {
+          headers: { token: linetoken }
+        })
+        .then(response => {
+          console.log(response);
+          alert("logout");
+        })
+        .catch(function(error) {
+          console.log("error" + error);
+          alert("error");
+        });
+    }
+  }
 };
 </script>
