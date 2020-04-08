@@ -23,7 +23,7 @@ Project สำหรับ CMU DEVDAY WORK SHOP 2020
 
 **Deploy**
 
-1 edit .env in Backend  set 2 point   1 firebase db key  2 cmu oauth key
+1 create .env in Backend  set 2 point   1 firebase db key  2 cmu oauth key
 
 2  git push to Heroku App
 
